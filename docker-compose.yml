@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  rabbitmq:
+    build:
+      context: ./rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./rabbitmq/init.sh:/init.sh
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg12
+    environment:
+      POSTGRES_PASSWORD: spitfire
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescaledb_data:/var/lib/timescaledb/data
+      - ./timescaledb/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+
+
+  amqp_consumer:
+    build:
+      context: ./amqp_consumer
+    depends_on:
+      - rabbitmq
+      - timescaledb
+    environment:
+      POSTGRES_HOST: timescaledb
+      RABBITMQ_HOST: rabbitmq
+
+  grafana:
+    image: grafana/grafana:latest
+    depends_on:
+      - timescaledb
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  timescaledb_data:
+  grafana_data:
