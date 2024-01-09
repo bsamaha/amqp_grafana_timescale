@@ -29,7 +29,7 @@ spec:
               value: timescaledb
             - name: RABBITMQ_HOST
               value: rabbitmq
-          image: amqp-consumer
+          image: bsamaha/amqp-consumer
           name: amqp-consumer
           resources: {}
       restartPolicy: Always
