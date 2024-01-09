@@ -46,7 +46,7 @@ spec:
               memory: "1Gi"
               cpu: "1"
           volumeMounts:
-            - mountPath: /init.sh
+            - mountPath: /etc/rabbitmq
               name: rabbitmq-claim0
       restartPolicy: Always
       volumes:
