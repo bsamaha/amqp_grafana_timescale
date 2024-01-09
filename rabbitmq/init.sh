@@ -1,6 +1,8 @@
 #!/bin/bash
 sleep 10  # Wait for RabbitMQ server to start
 
+echo "Setting up exchange, queue, and binding..."
+
 # Declare the exchange, queue, and binding
 rabbitmqadmin declare exchange name=gnss_data_exchange type=direct durable=true
 rabbitmqadmin declare queue name=gnss_data_queue durable=true

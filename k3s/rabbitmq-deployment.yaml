@@ -25,7 +25,7 @@ spec:
         io.kompose.service: rabbitmq
     spec:
       containers:
-        - image: bsamaha/amqp_grafana_timescale-rabbitmq
+        - image: bsamaha/myrabbitmq
           livenessProbe:
             exec:
               command:

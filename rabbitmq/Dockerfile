@@ -4,5 +4,5 @@ FROM rabbitmq:3-management
 COPY init.sh /init.sh
 
 
-# Set the default command to execute the script after RabbitMQ starts
-CMD ["/bin/bash", "-c", "/init.sh & rabbitmq-server", "chmod", "+x", "/init.sh"]
+RUN chmod +x /init.sh
+CMD ["/bin/bash", "-c", "/init.sh & rabbitmq-server"]
