@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\blake\kompose.exe convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: amqp-consumer
+  name: amqp-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: amqp-consumer
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Users\blake\kompose.exe convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: amqp-consumer
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_HOST
+              value: timescaledb
+            - name: RABBITMQ_HOST
+              value: rabbitmq
+          image: amqp-consumer
+          name: amqp_consumer
+          resources: {}
+      restartPolicy: Always
+status: {}

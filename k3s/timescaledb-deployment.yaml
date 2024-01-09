@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\blake\kompose.exe convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: timescaledb
+  name: timescaledb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: timescaledb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Users\blake\kompose.exe convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: timescaledb
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: spitfire
+            - name: POSTGRES_USER
+              value: postgres
+          image: timescale/timescaledb:latest-pg12
+          name: timescaledb
+          ports:
+            - containerPort: 5432
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/timescaledb/data
+              name: timescaledb-data
+            - mountPath: /docker-entrypoint-initdb.d/init-db.sql
+              name: timescaledb-claim1
+      restartPolicy: Always
+      volumes:
+        - name: timescaledb-data
+          persistentVolumeClaim:
+            claimName: timescaledb-data
+        - name: timescaledb-claim1
+          persistentVolumeClaim:
+            claimName: timescaledb-claim1
+status: {}
