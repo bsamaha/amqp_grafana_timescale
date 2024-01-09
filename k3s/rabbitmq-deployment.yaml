@@ -48,6 +48,11 @@ spec:
           volumeMounts:
             - mountPath: /etc/rabbitmq
               name: rabbitmq-claim0
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: "myrabbituser"
+            - name: RABBITMQ_DEFAULT_PASS
+              value: "myrabbitpassword"
       restartPolicy: Always
       volumes:
         - name: rabbitmq-claim0

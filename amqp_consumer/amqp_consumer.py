@@ -12,8 +12,8 @@ POSTGRES_PASSWORD = "postgres"
 # RabbitMQ connection parameters
 RABBITMQ_HOST = "rabbitmq-service"
 RABBITMQ_QUEUE = "gnss_data_queue"
-RABBITMQ_USER = "guest"
-RABBITMQ_PASS = "guest"
+RABBITMQ_USER = "myrabbituser"
+RABBITMQ_PASS = "myrabbitpassword"
 
 
 # Connect to PostgreSQL database
