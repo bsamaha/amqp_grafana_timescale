@@ -36,11 +36,17 @@ spec:
           name: timescaledb
           ports:
             - containerPort: 5432
-          resources: {}
+          resources:
+            requests:
+              memory: "200Mi"
+              cpu: "200m"
+            limits:
+              memory: "1Gi"
+              cpu: 1
           volumeMounts:
             - mountPath: /var/lib/timescaledb/data
               name: timescaledb-data
-            - mountPath: /docker-entrypoint-initdb.d/init-db.sql
+            - mountPath: /docker-entrypoint-initdb.d
               name: timescaledb-claim1
       restartPolicy: Always
       volumes:

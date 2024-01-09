@@ -38,7 +38,13 @@ spec:
           ports:
             - containerPort: 5672
             - containerPort: 15672
-          resources: {}
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
           volumeMounts:
             - mountPath: /init.sh
               name: rabbitmq-claim0
