@@ -7,10 +7,10 @@ import json
 POSTGRES_HOST = "timescaledb"
 POSTGRES_DB = "postgres"
 POSTGRES_USER = "postgres"
-POSTGRES_PASSWORD = "spitfire"
+POSTGRES_PASSWORD = "postgres"
 
 # RabbitMQ connection parameters
-RABBITMQ_HOST = "rabbitmq"
+RABBITMQ_HOST = "rabbitmq-service"
 RABBITMQ_QUEUE = "gnss_data_queue"
 RABBITMQ_USER = "guest"
 RABBITMQ_PASS = "guest"

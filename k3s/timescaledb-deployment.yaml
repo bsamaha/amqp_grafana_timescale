@@ -29,7 +29,7 @@ spec:
             - name: POSTGRES_DB
               value: postgres
             - name: POSTGRES_PASSWORD
-              value: spitfire
+              value: postgres
             - name: POSTGRES_USER
               value: postgres
           image: timescale/timescaledb:latest-pg12
