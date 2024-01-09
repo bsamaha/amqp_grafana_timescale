@@ -30,7 +30,7 @@ spec:
             - name: RABBITMQ_HOST
               value: rabbitmq
           image: amqp-consumer
-          name: amqp_consumer
+          name: amqp-consumer
           resources: {}
       restartPolicy: Always
 status: {}
