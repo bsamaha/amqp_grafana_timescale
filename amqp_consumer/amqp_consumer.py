@@ -7,13 +7,13 @@ import json
 POSTGRES_HOST = "timescaledb"
 POSTGRES_DB = "postgres"
 POSTGRES_USER = "postgres"
-POSTGRES_PASSWORD = "postgres"
+POSTGRES_PASSWORD = "password"
 
 # RabbitMQ connection parameters
-RABBITMQ_HOST = "rabbitmq-service"
+RABBITMQ_HOST = "rabbitmq"
 RABBITMQ_QUEUE = "gnss_data_queue"
-RABBITMQ_USER = "myrabbituser"
-RABBITMQ_PASS = "myrabbitpassword"
+RABBITMQ_USER = "guest"
+RABBITMQ_PASS = "guest"
 
 
 # Connect to PostgreSQL database
@@ -42,11 +42,11 @@ def insert_into_db(json_data):
         cur.execute(
             """
             INSERT INTO gngga (
-                time, full_time, lat, ns, lon, ew, quality,
+                full_time, lat, ns, lon, ew, quality,
                 num_sv, hdop, alt, alt_unit, sep, sep_unit,
                 diff_age, diff_station, processed_time, device_id
             ) VALUES (
-                %(time)s, %(full_time)s, %(lat)s, %(ns)s, %(lon)s, %(ew)s, %(quality)s,
+                %(full_time)s, %(lat)s, %(ns)s, %(lon)s, %(ew)s, %(quality)s,
                 %(num_sv)s, %(hdop)s, %(alt)s, %(alt_unit)s, %(sep)s, %(sep_unit)s,
                 %(diff_age)s, %(diff_station)s, %(processed_time)s, %(device_id)s
             )

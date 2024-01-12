@@ -18,8 +18,7 @@ CREATE TABLE experiments (
 
 CREATE TABLE gngga (
     id SERIAL PRIMARY KEY,
-    time TIME,
-    full_time TIMESTAMP,
+    full_time TIMESTAMP with TIME ZONE,
     lat DOUBLE PRECISION,
     ns TEXT,
     lon DOUBLE PRECISION,
@@ -34,7 +33,8 @@ CREATE TABLE gngga (
     diff_age INTEGER,
     diff_station TEXT,
     processed_time BIGINT,
-    device_id TEXT NOT NULL REFERENCES devices(id),
+    device_id TEXT,
+    -- device_id TEXT NOT NULL REFERENCES devices(id),
     -- change to not null later
     experiment_id UUID REFERENCES experiments(id) 
 );
