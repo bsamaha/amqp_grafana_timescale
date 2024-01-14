@@ -22,7 +22,7 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: rabbitmq
-  namespace: test-rabbitmq
+  namespace: rabbitmq
 subjects:
   - kind: ServiceAccount
     name: rabbitmq
