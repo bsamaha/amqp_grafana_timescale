@@ -1,0 +1,103 @@
+# Version control directories
+.git/
+.gitignore
+.svn/
+.hg/
+
+# Build and test directories
+node_modules/
+bower_components/
+dist/
+tmp/
+temp/
+cache/
+build/
+tests/
+coverage/
+*.log
+*.tmp
+*.temp
+
+# Dependency directories (comment out if you build your dependencies in Docker)
+#node_modules/
+#bower_components/
+
+# Various IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime*
+.project
+.settings/
+*.esproj
+*.tmp_proj
+nbproject/
+*.tss
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Archive and executable files
+*.jar
+*.war
+*.ear
+*.exe
+*.dll
+*.so
+*.iso
+*.tar
+*.zip
+*.gz
+*.rar
+*.7z
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+*.db
+
+# Environment files and secrets
+.env
+.secret
+
+# Optional: Exclude Dockerfile and .dockerignore if not used in build
+# Dockerfile
+# .dockerignore
+
+# Specific to Python projects
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+python_version
+
+# Specific to Node.js projects
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# Specific to Ruby projects
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/spec/examples.txt
+.test
