@@ -21,7 +21,7 @@ RUN apk add --no-cache libpq
 # Copy installed Python packages from builder stage
 COPY --from=builder /install /usr/local
 
-# Copy the Python script
-COPY amqp_consumer.py .
+# Copy the entire amqp_consumer module
+COPY . /app/
 
-CMD ["python", "amqp_consumer.py"]
+CMD ["python", "main.py"]

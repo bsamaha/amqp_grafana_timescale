@@ -37,6 +37,8 @@ services:
     environment:
       POSTGRES_HOST: timescaledb
       RABBITMQ_HOST: rabbitmq
+    env_file:
+      - amqp_consumer.env
 
   grafana:
     image: grafana/grafana:latest

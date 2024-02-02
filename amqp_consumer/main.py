@@ -2,27 +2,16 @@ import time
 import pika
 import psycopg2
 import json
-
-# PostgreSQL connection parameters
-POSTGRES_HOST = "timescaledb"
-POSTGRES_DB = "postgres"
-POSTGRES_USER = "postgres"
-POSTGRES_PASSWORD = "password"
-
-# RabbitMQ connection parameters
-RABBITMQ_HOST = "rabbitmq"
-RABBITMQ_QUEUE = "gnss_data_queue"
-RABBITMQ_USER = "guest"
-RABBITMQ_PASS = "guest"
+from config import Config
 
 
 # Connect to PostgreSQL database
 def get_postgres_connection():
     return psycopg2.connect(
-        host=POSTGRES_HOST,
-        database=POSTGRES_DB,
-        user=POSTGRES_USER,
-        password=POSTGRES_PASSWORD,
+        host=Config.POSTGRES_HOST,
+        database=Config.POSTGRES_DB,
+        user=Config.POSTGRES_USER,
+        password=Config.POSTGRES_PASSWORD,
     )
 
 
@@ -73,7 +62,7 @@ def on_message_received(ch, method, properties, body):
 
 # Connect to RabbitMQ and start consuming
 def main():
-    credentials = pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASS)
+    credentials = pika.PlainCredentials(Config.RABBITMQ_USER, Config.RABBITMQ_PASS)
     connection = None
     max_retries = 5
     retry_delay = 5  # seconds
@@ -81,7 +70,9 @@ def main():
     for attempt in range(max_retries):
         try:
             connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=RABBITMQ_HOST, credentials=credentials)
+                pika.ConnectionParameters(
+                    host=Config.RABBITMQ_HOST, credentials=credentials
+                )
             )
             break  # Connection successful
         except pika.exceptions.AMQPConnectionError as e:
@@ -98,9 +89,11 @@ def main():
 
     if connection is not None:
         channel = connection.channel()
-        channel.queue_declare(queue=RABBITMQ_QUEUE, durable=True)
+        channel.queue_declare(queue=Config.RABBITMQ_QUEUE, durable=True)
         channel.basic_consume(
-            queue=RABBITMQ_QUEUE, on_message_callback=on_message_received, auto_ack=True
+            queue=Config.RABBITMQ_QUEUE,
+            on_message_callback=on_message_received,
+            auto_ack=True,
         )
 
         print(" [*] Waiting for messages. To exit press CTRL+C")
