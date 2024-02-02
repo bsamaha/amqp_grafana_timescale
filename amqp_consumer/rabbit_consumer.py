@@ -1,7 +1,10 @@
-# rabbit_consumer.py
 import pika
 import time
 from config import Config
+from logger import setup_logger
+
+# Setup logger for this module
+logger = setup_logger("rabbit_consumer")
 
 
 class RabbitConsumer:
@@ -18,6 +21,7 @@ class RabbitConsumer:
         """Establishes a connection to RabbitMQ."""
         max_retries = 5
         retry_delay = 5  # seconds
+        logger.info("Attempting to connect to RabbitMQ")
 
         for attempt in range(max_retries):
             try:
@@ -33,15 +37,15 @@ class RabbitConsumer:
                     on_message_callback=self.on_message_callback,
                     auto_ack=True,
                 )
+                logger.info("Successfully connected to RabbitMQ and declared queue")
                 break  # Connection successful
             except pika.exceptions.AMQPConnectionError as e:
-                if attempt < max_retries - 1:
-                    print(
-                        f"Connection attempt {attempt + 1} of {max_retries} failed. Retrying in {retry_delay} seconds..."
-                    )
-                    time.sleep(retry_delay)
-                else:
-                    print(
+                logger.warning(
+                    f"Connection attempt {attempt + 1} of {max_retries} failed. Retrying in {retry_delay} seconds..."
+                )
+                time.sleep(retry_delay)
+                if attempt == max_retries - 1:
+                    logger.error(
                         "Max retries reached. Could not establish connection to RabbitMQ."
                     )
                     raise e
@@ -49,5 +53,5 @@ class RabbitConsumer:
     def start_consuming(self):
         """Starts consuming messages from RabbitMQ."""
         if self.connection and self.channel:
-            print(" [*] Waiting for messages. To exit press CTRL+C")
+            logger.info("RabbitMQ consumer started. Waiting for messages...")
             self.channel.start_consuming()

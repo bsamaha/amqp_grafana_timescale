@@ -1,17 +1,26 @@
 import psycopg2
 from config import Config
+from logger import setup_logger
+
+# Setup logger for this module
+logger = setup_logger("db_manager")
 
 
 class DBManager:
     @staticmethod
     def get_postgres_connection():
-        """Establishes a connection to the PostgreSQL database."""
-        return psycopg2.connect(
-            host=Config.POSTGRES_HOST,
-            database=Config.POSTGRES_DB,
-            user=Config.POSTGRES_USER,
-            password=Config.POSTGRES_PASSWORD,
-        )
+        try:
+            connection = psycopg2.connect(
+                host=Config.POSTGRES_HOST,
+                database=Config.POSTGRES_DB,
+                user=Config.POSTGRES_USER,
+                password=Config.POSTGRES_PASSWORD,
+            )
+            logger.debug("Successfully connected to the database")
+            return connection
+        except Exception as e:
+            logger.error(f"Database connection failed: {e}")
+            raise e
 
     @staticmethod
     def insert_into_db(json_data):
@@ -25,7 +34,7 @@ class DBManager:
         try:
             # Check if 'device_id' key exists in the JSON data
             if "device_id" not in json_data:
-                print("Dropped message: 'device_id' not found in the message")
+                logger.warning("Dropped message: 'device_id' not found in the message")
                 return
 
             cur.execute(
@@ -43,8 +52,10 @@ class DBManager:
                 json_data,
             )
             conn.commit()
+            logger.debug("Data inserted successfully into the database")
+
         except Exception as e:
-            print(f"Database error: {e}")
+            logger.error(f"Database error during insertion: {e}")
             conn.rollback()
         finally:
             cur.close()
