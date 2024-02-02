@@ -1,62 +1,71 @@
+# db_manager.py
 import psycopg2
+from contextlib import contextmanager
 from config import Config
 from logger import setup_logger
 
-# Setup logger for this module
 logger = setup_logger("db_manager")
-
 
 class DBManager:
     @staticmethod
-    def get_postgres_connection():
-        try:
-            connection = psycopg2.connect(
-                host=Config.POSTGRES_HOST,
-                database=Config.POSTGRES_DB,
-                user=Config.POSTGRES_USER,
-                password=Config.POSTGRES_PASSWORD,
-            )
-            logger.debug("Successfully connected to the database")
-            return connection
-        except Exception as e:
-            logger.error(f"Database connection failed: {e}")
-            raise e
+    def get_connection_params():
+        """Provides parameters for database connection."""
+        return {
+            "host": Config.POSTGRES_HOST,
+            "database": Config.POSTGRES_DB,
+            "user": Config.POSTGRES_USER,
+            "password": Config.POSTGRES_PASSWORD,
+        }
 
     @staticmethod
-    def insert_into_db(json_data):
-        """Inserts JSON data into the database."""
-        conn = DBManager.get_postgres_connection()
-        cur = conn.cursor()
-
-        # Convert 'processed_time' to an integer
-        json_data["processed_time"] = int(float(json_data["processed_time"]))
-
+    @contextmanager
+    def get_db_connection():
+        """Context manager for database connection."""
+        connection = None
         try:
-            # Check if 'device_id' key exists in the JSON data
-            if "device_id" not in json_data:
-                logger.warning("Dropped message: 'device_id' not found in the message")
-                return
-
-            cur.execute(
-                """
-                INSERT INTO gngga (
-                    full_time, lat, ns, lon, ew, quality,
-                    num_sv, hdop, alt, alt_unit, sep, sep_unit,
-                    diff_age, diff_station, processed_time, device_id
-                ) VALUES (
-                    %(full_time)s, %(lat)s, %(ns)s, %(lon)s, %(ew)s, %(quality)s,
-                    %(num_sv)s, %(hdop)s, %(alt)s, %(alt_unit)s, %(sep)s, %(sep_unit)s,
-                    %(diff_age)s, %(diff_station)s, %(processed_time)s, %(device_id)s
-                )
-                """,
-                json_data,
-            )
-            conn.commit()
-            logger.debug("Data inserted successfully into the database")
-
+            connection = psycopg2.connect(**DBManager.get_connection_params())
+            logger.debug("Successfully connected to the database")
+            yield connection
         except Exception as e:
-            logger.error(f"Database error during insertion: {e}")
-            conn.rollback()
+            logger.error(f"Database connection failed: {e}")
+            raise
         finally:
-            cur.close()
-            conn.close()
+            if connection:
+                connection.close()
+
+    @staticmethod
+    @contextmanager
+    def get_db_cursor(commit=False):
+        """Context manager for database cursor."""
+        with DBManager.get_db_connection() as connection:
+            cursor = connection.cursor()
+            try:
+                yield cursor
+                if commit:
+                    connection.commit()
+            except Exception as e:
+                connection.rollback()
+                raise
+            finally:
+                cursor.close()
+
+    @staticmethod
+    def insert_into_db(data):
+        """Generic method to insert JSON data into the specified table."""
+        table_name = data.get("message_type").lower()  # Assuming this is safe and validated upstream
+        data.pop("message_type", None)  # Remove message_type from data
+        
+        logger.debug(f"Inserting data into {table_name}")
+        logger.debug(f"Data to be inserted: {data}")
+        
+        with DBManager.get_db_cursor(commit=True) as cur:
+            placeholders = ", ".join(["%s"] * len(data))
+            columns = ", ".join(data.keys())
+            values = tuple(data.values())
+            query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+            try:
+                cur.execute(query, values)
+                logger.debug(f"Data inserted successfully into {table_name}")
+            except Exception as e:
+                logger.error(f"Error inserting data into {table_name}: {e}")
+                raise
