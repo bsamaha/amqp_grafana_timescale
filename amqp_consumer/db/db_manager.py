@@ -1,5 +1,6 @@
-# db_manager.py
+import time
 import psycopg2
+from psycopg2 import pool
 from contextlib import contextmanager
 from config import Config
 from logger import setup_logger
@@ -7,57 +8,61 @@ from logger import setup_logger
 logger = setup_logger("db_manager")
 
 class DBManager:
-    @staticmethod
-    def get_connection_params():
-        """Provides parameters for database connection."""
-        return {
-            "host": Config.POSTGRES_HOST,
-            "database": Config.POSTGRES_DB,
-            "user": Config.POSTGRES_USER,
-            "password": Config.POSTGRES_PASSWORD,
-        }
+    _connection_pool = None
 
-    @staticmethod
-    @contextmanager
-    def get_db_connection():
-        """Context manager for database connection."""
-        connection = None
-        try:
-            connection = psycopg2.connect(**DBManager.get_connection_params())
-            logger.debug("Successfully connected to the database")
-            yield connection
-        except Exception as e:
-            logger.error(f"Database connection failed: {e}")
-            raise
-        finally:
-            if connection:
-                connection.close()
+    @classmethod
+    def initialize_connection_pool(cls, max_retries=5, delay_between_retries=2):
+        """
+        Initialize the database connection pool with retry logic.
+
+        Parameters:
+        - max_retries: Maximum number of connection attempts.
+        - delay_between_retries: Delay in seconds between connection attempts.
+        """
+        for attempt in range(1, max_retries + 1):
+            try:
+                cls._connection_pool = psycopg2.pool.SimpleConnectionPool(
+                    1, 10,  # min and max connections
+                    host=Config.POSTGRES_HOST,
+                    database=Config.POSTGRES_DB,
+                    user=Config.POSTGRES_USER,
+                    password=Config.POSTGRES_PASSWORD,
+                )
+                logger.info("Database connection pool initialized successfully.")
+                break  # Exit loop if connection is successful
+            except psycopg2.OperationalError as e:
+                logger.error(f"Attempt {attempt} failed: {e}")
+                if attempt == max_retries:
+                    logger.error("All attempts to connect to the database have failed.")
+                    raise
+                else:
+                    time.sleep(delay_between_retries)
 
     @staticmethod
     @contextmanager
     def get_db_cursor(commit=False):
-        """Context manager for database cursor."""
-        with DBManager.get_db_connection() as connection:
+        connection = None
+        try:
+            connection = DBManager._connection_pool.getconn()
             cursor = connection.cursor()
-            try:
-                yield cursor
-                if commit:
-                    connection.commit()
-            except Exception as e:
+            yield cursor
+            if commit:
+                connection.commit()
+        except Exception as e:
+            if connection:
                 connection.rollback()
-                raise
-            finally:
+            logger.error(f"Database operation failed: {e}")
+            raise
+        finally:
+            if cursor:
                 cursor.close()
+            if connection:
+                DBManager._connection_pool.putconn(connection)
 
     @staticmethod
-    def insert_into_db(data):
+    def insert_into_db(table_name, data):
         """Generic method to insert JSON data into the specified table."""
-        table_name = data.get("message_type").lower()  # Assuming this is safe and validated upstream
-        data.pop("message_type", None)  # Remove message_type from data
-        
-        logger.debug(f"Inserting data into {table_name}")
-        logger.debug(f"Data to be inserted: {data}")
-        
+      
         with DBManager.get_db_cursor(commit=True) as cur:
             placeholders = ", ".join(["%s"] * len(data))
             columns = ", ".join(data.keys())

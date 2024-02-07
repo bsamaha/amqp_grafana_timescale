@@ -23,6 +23,8 @@ def on_message_received(ch, method, properties, body):
 
 def main():
     logger.info("Application started")
+    DBManager.initialize_connection_pool()  # Initialize the DB connection pool
+
     # Initialize RabbitConsumer with the queue name and callback function
     rabbit_consumer = RabbitConsumer(Config.RABBITMQ_QUEUE, on_message_received)
     # Start consuming messages, which includes connecting to RabbitMQ
