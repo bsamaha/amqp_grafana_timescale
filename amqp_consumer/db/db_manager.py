@@ -11,7 +11,7 @@ class DBManager:
     _connection_pool = None
 
     @classmethod
-    def initialize_connection_pool(cls, max_retries=5, delay_between_retries=2):
+    def initialize_connection_pool(cls, max_retries=10, delay_between_retries=5):
         """
         Initialize the database connection pool with retry logic.
 

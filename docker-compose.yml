@@ -7,7 +7,15 @@ services:
       - "5672:5672"
       - "15672:15672"
     volumes:
-      - ./rabbitmq/init.sh:/init.sh
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
+    environment:
+      RABBITMQ_ERLANG_COOKIE: 'a_secret_cookie'
+      RABBITMQ_DEFAULT_USER: 'user'
+      RABBITMQ_DEFAULT_PASS: 'password'
+      RABBITMQ_CONFIG_FILE: '/etc/rabbitmq/rabbitmq'
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: '-rabbitmq_management load_definitions "/etc/rabbitmq/definitions.json"'
+    depends_on:
+      - timescaledb
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 30s
@@ -44,6 +52,7 @@ services:
     image: grafana/grafana:latest
     depends_on:
       - timescaledb
+      - rabbitmq
     ports:
       - "3000:3000"
     volumes:

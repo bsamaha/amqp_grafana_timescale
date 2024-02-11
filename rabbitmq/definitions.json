@@ -1,0 +1,55 @@
+{
+    "vhosts": [
+      {
+        "name": "/"
+      }
+    ],
+    "exchanges": [
+      {
+        "name": "gnss_data_exchange",
+        "type": "direct",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {},
+        "vhost": "/"
+      }
+    ],
+    "queues": [
+      {
+        "name": "gnss_data_queue",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {},
+        "vhost": "/"
+      }
+    ],
+    "bindings": [
+      {
+        "source": "gnss_data_exchange",
+        "destination": "gnss_data_queue",
+        "destination_type": "queue",
+        "routing_key": "gnss_routing_key",
+        "arguments": {},
+        "vhost": "/"
+      }
+    ],
+    "users": [
+      {
+        "name": "user",
+        "password_hash": "qv00gu61cQ+DArHrjEP3TH64VZWSpDVe01JOIZtZFOcqleHY",
+        "hashing_algorithm": "rabbit_password_hashing_sha256",
+        "tags": "administrator"
+      }
+    ],
+    "permissions": [
+      {
+        "user": "user",
+        "vhost": "/",
+        "configure": ".*",
+        "write": ".*",
+        "read": ".*"
+      }
+    ]
+  }
+  
