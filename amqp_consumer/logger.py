@@ -1,15 +1,15 @@
 import logging
 
 
-def setup_logger(name):
+def setup_logger(name, level=logging.INFO):
     """Sets up a logger for a given module."""
     # Create a logger
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)  # Set the logging level
+    logger.setLevel(level)  # Set the logging level
 
     # Create console handler and set level to debug
     ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
+    ch.setLevel(level)
 
     # Create formatter
     formatter = logging.Formatter(

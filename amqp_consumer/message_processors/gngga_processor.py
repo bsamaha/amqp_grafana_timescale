@@ -4,13 +4,13 @@ from db.db_manager import DBManager
 
 from logger import setup_logger
 
-logger = setup_logger("gngga_processor")
+logger = setup_logger("gngga_processor", level="INFO")
 
 
 class GNGGAProcessor(BaseProcessor):
     def process(self):
         self.data = self.validate(self.data)
-        logger.debug(f"Validated data: {self.data}")
+        logger.debug("Validated data: %s", self.data)
         if self.data:
             table_name = "gngga"
             DBManager.insert_into_db(table_name=table_name,data=self.data)
@@ -50,7 +50,7 @@ class GNGGAProcessor(BaseProcessor):
                 try:
                     data[key] = float(data[key])
                 except ValueError:
-                    logger.error(f"Invalid value for {key}, setting to default {default}.")
+                    logger.error("Invalid value for %s, setting to default %s.", key, default)
                     data[key] = default
 
         # Additional validations can be implemented as needed, e.g., checking if lat and lon are within valid ranges

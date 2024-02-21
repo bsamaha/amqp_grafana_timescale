@@ -22,9 +22,8 @@ services:
       timeout: 10s
       retries: 5
 
-
   timescaledb:
-    image: timescale/timescaledb:latest-pg12
+    image: timescale/timescaledb:latest-pg14
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
@@ -34,7 +33,11 @@ services:
     volumes:
       - timescaledb_data:/var/lib/timescaledb/data
       - ./timescaledb/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   amqp_consumer:
     build:
@@ -47,6 +50,11 @@ services:
       RABBITMQ_HOST: rabbitmq
     env_file:
       - amqp_consumer.env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:your_amqp_consumer_port/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   grafana:
     image: grafana/grafana:latest
@@ -57,6 +65,11 @@ services:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
   timescaledb_data:
