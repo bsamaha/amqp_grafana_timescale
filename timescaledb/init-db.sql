@@ -75,7 +75,7 @@ CREATE TABLE nav_pvt (
     validTime INT,
     tAcc BIGINT,
     fixType TEXT,
-    gnssFixOk BOOLEAN,
+    gnssFixOk INT,
     numSV INT,
     lon DOUBLE PRECISION,
     lat DOUBLE PRECISION,

@@ -26,31 +26,26 @@ class NavPVTProcessor(BaseProcessor):
         """
         # Default values for fields that can be empty or need conversion
         defaults = {
-            # Assuming None for fields that are allowed to be NULL in the database
-            "lat": None,  # Latitude can be NULL if not available
-            "lon": None,  # Longitude can be NULL if not available
-            "height": 0.0,  # Default height if not provided
-            "hMSL": 0.0,  # Height above mean sea level
-            "hAcc": 0.0,  # Horizontal accuracy
-            "vAcc": 0.0,  # Vertical accuracy
-            "velN": 0.0,  # Velocity North
-            "velE": 0.0,  # Velocity East
-            "velD": 0.0,  # Velocity Down
-            "gSpeed": 0.0,  # Ground Speed
-            "headMot": 0.0,  # Heading of motion
-            "sAcc": 0.0,  # Speed accuracy
-            "headAcc": 0.0,  # Heading accuracy
-            "pDOP": 0.0,  # Positional Dilution of Precision
-            "numSV": 0,  # Number of satellites
-            "tAcc": 0,  # Time accuracy
-            # For boolean fields, assuming False as default. Adjust based on your data handling needs.
-            "validDate": 1,
-            "validTime": 1,
-            "gnssFixOk": False,
-            # For textual data, assuming empty string if not applicable. Adjust as necessary.
+            "lat": None,
+            "lon": None,
+            "height": 0.0,
+            "hMSL": 0.0,
+            "hAcc": 0.0,
+            "vAcc": 0.0,
+            "velN": 0.0,
+            "velE": 0.0,
+            "velD": 0.0,
+            "gSpeed": 0.0,
+            "headMot": 0.0,
+            "sAcc": 0.0,
+            "headAcc": 0.0,
+            "pDOP": 0.0,
+            "numSV": 0,
+            "tAcc": 0,
+            "validDate": 0,  # Boolean, will be cast to int
+            "validTime": 0,  # Boolean, will be cast to int
+            "gnssFixOk": 0,  # Boolean, will be cast to int
             "fixType": "",
-            # Assuming current year, month, day, hour, min, and second if not provided
-            # These should ideally be populated with actual data to avoid defaults if possible
             "year": 2024,
             "month": 1,
             "day": 1,
@@ -66,17 +61,24 @@ class NavPVTProcessor(BaseProcessor):
         for key, default in defaults.items():
             if not data.get(key) or data[key] == "":
                 data[key] = default
-            elif key in ["lat", "lon", "height", "height_msl", "horizontal_acc", "vertical_acc", "velocity_north", "velocity_east", "velocity_down", "velocity", "heading_acc", "speed_over_ground", "heading_of_motion", "heading_of_vehicle", "magnetic_declination", "declination_acc", "pdop"]:
+            elif key in ["lat", "lon", "height", "hMSL", "hAcc", "vAcc", "velN", "velE", "velD", "gSpeed", "headMot", "sAcc", "headAcc", "pDOP"]:
                 try:
                     data[key] = float(data[key])
                 except ValueError:
                     logger.error("Invalid value for %s, setting to default %s.", key, default)
                     data[key] = default
+            elif key in ["validDate", "validTime", "gnssFixOk"]:
+                # Cast boolean values to integer (True to 1, False to 0)
+                data[key] = int(bool(data[key]))
 
         # Ensure mandatory fields like 'full_time', 'device_id', and 'experiment_id' are valid
         if not data.get("full_time") or not data.get("device_id") or not data.get("experiment_id"):
             logger.error("Missing mandatory field 'full_time', 'device_id', or 'experiment_id'.")
             return None
 
+        # Optionally, convert 'full_time' to a timestamp format if it's not already
+        # This step depends on how 'full_time' is represented in your incoming data
+        # and how you want it formatted in your database.
+        # Example conversion could be added here if necessary.
 
         return data
