@@ -27,7 +27,7 @@ class GNGGAProcessor(BaseProcessor):
         """
         # Default values for fields that can be empty or need conversion
         defaults = {
-            "lat": None,  # Use NULL for database if not applicable
+            "lat": None,  
             "lon": None,
             "alt": 0.0,
             "sep": 0.0,
